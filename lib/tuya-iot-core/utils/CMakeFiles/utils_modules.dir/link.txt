@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../lib/libutils_modules.a CMakeFiles/utils_modules.dir/cJSON.c.o CMakeFiles/utils_modules.dir/log.c.o
+/usr/bin/ranlib ../lib/libutils_modules.a
