@@ -1,0 +1,33 @@
+#!/bin/sh /etc/rc.common
+
+USE_PROCD=1
+START=95
+STOP=01
+
+start_service() {
+        local enabled
+
+        config_load 'tuyad'
+        config_get enabled tuya_s 'enable' '0'
+		config_get devId tuya_s 'deviceId' ''
+		config_get devSec tuya_s 'deviceSecret' ''
+		config_get prodId tuya_s 'productId' ''
+		config_get interval tuya_s 'dataInterval' '5000'
+
+	if [ "$enabled" -eq 1 ]; then
+	        procd_open_instance
+	        procd_set_param command /usr/bin/tuyad -i "$devId" -s "$devSec" -p "$prodId" -m "$interval"
+	        procd_set_param pidfile /var/run/tuyad.pid
+			procd_set_param file /etc/config/tuyad
+        	procd_close_instance
+	fi
+}
+
+service_triggers() {
+	procd_add_reload_trigger "tuyad"
+}
+
+reload_service() {
+	stop
+	start
+}

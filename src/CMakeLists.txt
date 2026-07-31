@@ -3,18 +3,25 @@ set( APP_NAME "tuyad" )
 # Demo target.
 add_executable(
     ${APP_NAME}
-        "${APP_NAME}.c"
-        "arguments.c"
-        "deviceinfo.c"
-        "actions.c"
-        "daemon.c"
-        "tuya_func.c"
+        "src/${APP_NAME}.c"
+        "src/arguments.c"
+        "src/deviceinfo.c"
+        "src/actions.c"
+        "src/daemon.c"
+        "src/tuya_func.c"
+        "src/memory.c"
 )
 
 target_link_libraries(
     ${APP_NAME}
     PUBLIC
-        tuya_core
+        link_core
+        middleware_implementation
+        platform_port
+        utils_modules
+        blobmsg_json
+        ubox
+        ubus
 )
 
 target_include_directories(
@@ -22,3 +29,5 @@ target_include_directories(
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
 )
+
+install(TARGETS ${APP_NAME} DESTINATION /usr/bin)

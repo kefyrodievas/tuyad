@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib/liblink_core.a CMakeFiles/link_core.dir/tuyalink_core.c.o CMakeFiles/link_core.dir/cipher_wrapper.c.o CMakeFiles/link_core.dir/__/libraries/coreJSON/source/core_json.c.o
-/usr/bin/ranlib ../lib/liblink_core.a
