@@ -10,6 +10,7 @@ add_executable(
         "src/daemon.c"
         "src/tuya_func.c"
         "src/memory.c"
+        "src/network.c"
 )
 
 target_link_libraries(
@@ -22,7 +23,10 @@ target_link_libraries(
         blobmsg_json
         ubox
         ubus
+        uci
 )
+
+add_compile_options(-g)
 
 target_include_directories(
     ${APP_NAME}

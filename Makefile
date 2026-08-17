@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tuyad
 PKG_RELEASE:=1
-PKG_VERSION:=1.0.1
+PKG_VERSION:=1.0.2
 
 CMAKE_INSTALL:=1
 
@@ -13,7 +13,7 @@ include $(INCLUDE_DIR)/cmake.mk
 define Package/tuyad
 	CATEGORY:=Base system
 	TITLE:=tuyad
-	DEPENDS:=+libtuyasdk +libblobmsg-json +libubus +libubox
+	DEPENDS:=+libtuyasdk +libblobmsg-json +libubus +libubox +libuci
 endef
 
 define Package/tuyad/description

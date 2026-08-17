@@ -2,7 +2,8 @@
 #include <libubus.h>
 #include "memory.h"
 
-enum {
+enum
+{
 	TOTAL_MEMORY,
 	FREE_MEMORY,
 	SHARED_MEMORY,
@@ -10,7 +11,8 @@ enum {
 	__MEMORY_MAX,
 };
 
-enum {
+enum
+{
 	MEMORY_DATA,
 	__INFO_MAX,
 };
@@ -18,14 +20,14 @@ enum {
 int rc = 0;
 
 static const struct blobmsg_policy memory_policy[__MEMORY_MAX] = {
-	[TOTAL_MEMORY]	  = { .name = "total", .type = BLOBMSG_TYPE_INT64 },
-	[FREE_MEMORY]	  = { .name = "free", .type = BLOBMSG_TYPE_INT64 },
-	[SHARED_MEMORY]	  = { .name = "shared", .type = BLOBMSG_TYPE_INT64 },
-	[BUFFERED_MEMORY] = { .name = "buffered", .type = BLOBMSG_TYPE_INT64 },
+	[TOTAL_MEMORY] = {.name = "total", .type = BLOBMSG_TYPE_INT64},
+	[FREE_MEMORY] = {.name = "free", .type = BLOBMSG_TYPE_INT64},
+	[SHARED_MEMORY] = {.name = "shared", .type = BLOBMSG_TYPE_INT64},
+	[BUFFERED_MEMORY] = {.name = "buffered", .type = BLOBMSG_TYPE_INT64},
 };
 
 static const struct blobmsg_policy info_policy[__INFO_MAX] = {
-	[MEMORY_DATA] = { .name = "memory", .type = BLOBMSG_TYPE_TABLE },
+	[MEMORY_DATA] = {.name = "memory", .type = BLOBMSG_TYPE_TABLE},
 };
 
 static void board_cb(struct ubus_request *req, int type, struct blob_attr *msg)
@@ -36,42 +38,47 @@ static void board_cb(struct ubus_request *req, int type, struct blob_attr *msg)
 
 	blobmsg_parse(info_policy, __INFO_MAX, tb, blob_data(msg), blob_len(msg));
 
-	if (!tb[MEMORY_DATA]) {
+	if (!tb[MEMORY_DATA])
+	{
 		fprintf(stderr, "No memory data received\n");
 		rc = -1;
 		return;
 	}
 
 	blobmsg_parse(memory_policy, __MEMORY_MAX, memory, blobmsg_data(tb[MEMORY_DATA]),
-		      blobmsg_data_len(tb[MEMORY_DATA]));
+				  blobmsg_data_len(tb[MEMORY_DATA]));
 
-	memoryData->total    = blobmsg_get_u64(memory[TOTAL_MEMORY]);
-	memoryData->free     = blobmsg_get_u64(memory[FREE_MEMORY]);
-	memoryData->shared   = blobmsg_get_u64(memory[SHARED_MEMORY]);
+	memoryData->total = blobmsg_get_u64(memory[TOTAL_MEMORY]);
+	memoryData->free = blobmsg_get_u64(memory[FREE_MEMORY]);
+	memoryData->shared = blobmsg_get_u64(memory[SHARED_MEMORY]);
 	memoryData->buffered = blobmsg_get_u64(memory[BUFFERED_MEMORY]);
 }
 
-int get_memory_info(struct meminfo * memory){
-    struct ubus_context *ctx;
+int get_memory_info(struct meminfo *memory)
+{
+	struct ubus_context *ctx;
 	uint32_t id;
 
 	memory->buffered = 0;
-    memory->free = 0;
-    memory->shared = 0;
-    memory->total = 0;
+	memory->free = 0;
+	memory->shared = 0;
+	memory->total = 0;
 
 	ctx = ubus_connect(NULL);
-	if (!ctx) {
-        rc = -1;
-        goto end;
-    }
-
-    if (ubus_lookup_id(ctx, "system", &id) ||
-	    ubus_invoke(ctx, id, "info", NULL, board_cb, memory, 3000)) {
+	if (!ctx)
+	{
 		rc = -1;
-        goto end;
-    }
+		goto end;
+	}
+
+	if (ubus_lookup_id(ctx, "system", &id) ||
+		ubus_invoke(ctx, id, "info", NULL, board_cb, memory, 3000))
+	{
+		rc = -1;
+		goto end;
+	}
 end:
-    if(ctx)	ubus_free(ctx);
-    return rc;
+	if (ctx)
+		ubus_free(ctx);
+	return rc;
 }

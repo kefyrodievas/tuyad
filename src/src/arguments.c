@@ -5,12 +5,15 @@
 #include <stdint.h>
 
 int parse_args(int argc, char **argv, struct arguments *args,
-               struct option *long_opts) {
+               struct option *long_opts)
+{
   uint8_t flags = 0;
   int option;
   while ((option = getopt_long(argc, argv, "hDp:i:s:m:", long_opts, NULL)) !=
-         -1) {
-    switch (option) {
+         -1)
+  {
+    switch (option)
+    {
     case 'h':
       break;
     case 'i':
@@ -37,7 +40,8 @@ int parse_args(int argc, char **argv, struct arguments *args,
       return -1;
     }
   }
-  if(!(flags & 0b10000)){
+  if (!(flags & 0b10000))
+  {
     args->interval = 5000;
   }
   if (!(flags & 0b1) || !(flags & 0b10) || !(flags & 0b100))

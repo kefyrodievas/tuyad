@@ -7,11 +7,13 @@ void on_connected(tuya_mqtt_context_t *context, void *user_data) {}
 void on_disconnect(tuya_mqtt_context_t *context, void *user_data) {}
 
 void on_messages(tuya_mqtt_context_t *context, void *user_data,
-                 const tuyalink_message_t *msg) {
+                 const tuyalink_message_t *msg)
+{
   int status;
   cJSON *action_data = NULL;
   cJSON *action_code = NULL;
-  switch (msg->type) {
+  switch (msg->type)
+  {
   case THING_TYPE_MODEL_RSP:
     break;
 
@@ -23,16 +25,21 @@ void on_messages(tuya_mqtt_context_t *context, void *user_data,
   case THING_TYPE_ACTION_EXECUTE:
     action_data = cJSON_Parse(msg->data_string);
     action_code = cJSON_GetObjectItem(action_data, "actionCode");
-    if (strcpy(action_code->valuestring, "action_log")) {
+    if (strcpy(action_code->valuestring, "action_log"))
+    {
       status = action_log(action_data);
-
-    } else {
+    }
+    else
+    {
       status = 1;
     }
-    if (status != 0) {
+    if (status != 0)
+    {
       syslog(LOG_ERROR, "Action %s returned %d: ", action_code->valuestring,
              status);
-    } else {
+    }
+    else
+    {
       syslog(LOG_INFO, "Action %s completed successfully",
              action_code->valuestring);
     }

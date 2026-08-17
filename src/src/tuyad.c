@@ -5,7 +5,7 @@
 #include "tuya_error_code.h"
 #include "tuya_func.h"
 #include "tuyalink_core.h"
-// #include <argp.h>
+#include "network.h"
 #include "memory.h"
 #include <assert.h>
 #include <getopt.h>
@@ -24,16 +24,20 @@ tuya_mqtt_context_t client_instance;
 
 bool loop_break = false;
 
-void sig_handler(int signum) {
-  if (signum == SIGTERM) {
+void sig_handler(int signum)
+{
+  if (signum == SIGTERM)
+  {
     loop_break = true;
   }
-  if (signum == SIGINT) {
+  if (signum == SIGINT)
+  {
     loop_break = true;
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   signal(SIGTERM, sig_handler);
   signal(SIGINT, sig_handler);
   // make tuya stdout logs quiet
@@ -66,10 +70,12 @@ int main(int argc, char **argv) {
     return ret;
   }
   // argp_parse(&argp, argc, argv, 0, 0, &arguments);
-  if (arguments.daemonize) {
+  if (arguments.daemonize)
+  {
     // turn this process into a daemon
     ret = become_daemon(0);
-    if (ret) {
+    if (ret)
+    {
       syslog(LOG_USER | LOG_ERR, "Error starting daemon");
       closelog();
       return EXIT_FAILURE;
@@ -89,23 +95,40 @@ int main(int argc, char **argv) {
                                    .device_id = arguments.deviceId,
                                    .device_secret = arguments.deviceSecret,
                                    .keepalive = 60,
-                                   .timeout_ms = arguments.interval/2,
+                                   .timeout_ms = arguments.interval / 2,
                                    .on_connected = on_connected,
                                    .on_disconnect = on_disconnect,
                                    .on_messages = on_messages});
-  if (ret != OPRT_OK) {
+  if (ret != OPRT_OK)
+  {
     syslog(LOG_ERROR, "Could not initialize Tuya MQTT context");
     goto end;
   }
 
   ret = tuya_mqtt_connect(client);
 
-  if (ret != OPRT_OK) {
+  if (ret != OPRT_OK)
+  {
     syslog(LOG_ERROR, "Could not connect to the server");
     goto end;
   }
 
   syslog(LOG_INFO, "Connected to server successfully");
+
+  struct net_list *list = network_lookup_uci();
+  netinfo(&list);
+
+  // for (struct net_list *curr = list; curr != NULL; curr = curr->next)
+  // {
+  //   printf("interface: %s\n"
+  //          "device: %s\n"
+  //          "address_v4: %s\n"
+  //          "netmask_v4: %u\n"
+  //          "address_v6: %s\n"
+  //          "netmask_v6: %u\n",
+  //          curr->device.name, curr->device.device, curr->device.address_v4,
+  //          curr->device.netmask_v4, curr->device.address_v6, curr->device.netmask_v6);
+  // }
 
   struct timeval start, curr;
   gettimeofday(&start, NULL);
@@ -113,13 +136,15 @@ int main(int argc, char **argv) {
   union cpuinfo cpu_prev, cpu_curr;
   get_cpu_info(&cpu_prev);
   long uptime;
-  for (;;) {
+  for (;;)
+  {
     ret = OPRT_OK;
     // get time elapsed since last loop
     gettimeofday(&curr, NULL);
     uint64_t delta_ms = (curr.tv_sec - start.tv_sec) * 1000 +
                         (curr.tv_usec - start.tv_usec) / 1000;
-    if (delta_ms >= arguments.interval) {
+    if (delta_ms >= arguments.interval)
+    {
       // reset timer
       gettimeofday(&start, NULL);
 
@@ -127,17 +152,19 @@ int main(int argc, char **argv) {
       ret = get_memory_info(&memory);
       get_cpu_info(&cpu_curr);
       uptime = get_uptime();
-      struct netlist *networks = NULL;
-      networks = get_net_info();
+      // printf("before netinfo\n");
+      netinfo(&list);
 
+      // printf("before json\n");
       char *str = device_data_to_json(memory, cpu_diff(cpu_prev, cpu_curr),
-                                      networks, uptime);
-
+                                      list, uptime);
+      // printf("after json\n");
       cpu_prev = cpu_curr;
       ret = tuyalink_thing_property_report_with_ack(client, NULL, str);
       free(str);
-      freenetlist(networks);
-      if (ret < 0) {
+      // freenetlist(networks);
+      if (ret < 0)
+      {
         syslog(LOG_ERROR,
                "Failed to send device information, property report returned %d",
                ret);
@@ -146,7 +173,8 @@ int main(int argc, char **argv) {
 
     /* Loop to receive packets, and handles client keepalive */
     ret = tuya_mqtt_loop(client);
-    if (ret < 0) {
+    if (ret < 0)
+    {
       syslog(LOG_ERROR, "tuya_mqtt_loop failed, return code: %d", ret);
       break;
     }

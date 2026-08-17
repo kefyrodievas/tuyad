@@ -7,7 +7,8 @@
 // https://lloydroc.github.io/post/c/unix-daemon-example/
 
 int // returns 0 on success -1 on error
-become_daemon(int flags) {
+become_daemon(int flags)
+{
   int maxfd, fd;
 
   /* The first fork will change our pid
@@ -50,7 +51,8 @@ become_daemon(int flags) {
    * be the process group leader and thus, cannot
    * have the controlling terminal if there was one.
    */
-  switch (fork()) {
+  switch (fork())
+  {
   case -1:
     return -1;
   case 0:
@@ -74,7 +76,8 @@ become_daemon(int flags) {
       close(fd);
   }
 
-  if (!(flags & BD_NO_REOPEN_STD_FDS)) {
+  if (!(flags & BD_NO_REOPEN_STD_FDS))
+  {
     /* now time to go "dark"!
      * we'll close stdin
      * then we'll point stdout and stderr

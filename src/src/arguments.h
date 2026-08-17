@@ -4,7 +4,8 @@
 #include <string.h>
 #include <getopt.h>
 
-struct arguments {
+struct arguments
+{
   char *deviceId;
   char *deviceSecret;
   char *productId;
