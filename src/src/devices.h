@@ -2,12 +2,12 @@
 
 #include <stdbool.h>
 
-enum{
+enum {
     ON,
     OFF
 };
 
-enum{
+enum {
     RC,
     MSG,
     DATA,
@@ -21,13 +21,19 @@ enum {
     DATA_MAX
 };
 
-struct data_output{
+struct data_output {
     int rc;
-    char * msg;
+    char *msg;
     bool sensor_value;
-    int humidity;
+    double humidity;
     double temperature;
 };
 
+struct port {
+    char *port;
+    int vid, pid;
+};
 
-int set_device_pin_state(char * port, int state, int pin, struct data_output * output);
+int set_device_pin_state(char *port, int state, int pin, struct data_output *output);
+int get_sensor_data(char *port, int pin, char *sensor, char *model, struct data_output *output);
+char *data_to_json(struct data_output out);
