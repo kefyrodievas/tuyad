@@ -5,8 +5,8 @@ add_executable(
     ${APP_NAME}
         "src/${APP_NAME}.c"
         "src/arguments.c"
-        "src/deviceinfo.c"
-        "src/actions.c"
+        "src/devices.c"
+        # "src/actions.c"
         "src/daemon.c"
         "src/tuya_func.c"
         "src/memory.c"

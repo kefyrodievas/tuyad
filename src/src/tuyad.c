@@ -1,6 +1,6 @@
 #include "arguments.h"
 #include "daemon.h"
-#include "deviceinfo.h"
+// #include "deviceinfo.h"
 #include "tuya_cacert.h"
 #include "tuya_error_code.h"
 #include "tuya_func.h"
@@ -107,42 +107,10 @@ int main(int argc, char **argv) {
 
   syslog(LOG_INFO, "Connected to server successfully");
 
-  struct timeval start, curr;
-  gettimeofday(&start, NULL);
-  struct meminfo memory;
-  union cpuinfo cpu_prev, cpu_curr;
-  get_cpu_info(&cpu_prev);
-  long uptime;
   for (;;) {
     ret = OPRT_OK;
     // get time elapsed since last loop
-    gettimeofday(&curr, NULL);
-    uint64_t delta_ms = (curr.tv_sec - start.tv_sec) * 1000 +
-                        (curr.tv_usec - start.tv_usec) / 1000;
-    if (delta_ms >= arguments.interval) {
-      // reset timer
-      gettimeofday(&start, NULL);
-
-      // get system info
-      ret = get_memory_info(&memory);
-      get_cpu_info(&cpu_curr);
-      uptime = get_uptime();
-      struct netlist *networks = NULL;
-      networks = get_net_info();
-
-      char *str = device_data_to_json(memory, cpu_diff(cpu_prev, cpu_curr),
-                                      networks, uptime);
-
-      cpu_prev = cpu_curr;
-      ret = tuyalink_thing_property_report_with_ack(client, NULL, str);
-      free(str);
-      freenetlist(networks);
-      if (ret < 0) {
-        syslog(LOG_ERROR,
-               "Failed to send device information, property report returned %d",
-               ret);
-      }
-    }
+    
 
     /* Loop to receive packets, and handles client keepalive */
     ret = tuya_mqtt_loop(client);
